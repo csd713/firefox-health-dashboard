@@ -29,11 +29,11 @@ export default class Speedometer extends Component {
     let canaryLastDataPoint;
     let status;
 
-    if (targetLine && targetDiff) {
-      canaryLastDataPoint = targetLine;
-      // In September, we adjusted the benchmark and caused Canary and Firefox
-      // to have a new baseline. For this graph we need to drop data before then
-      data.series[0] = data.series[0].filter((el) => {
+    // In September, we adjusted the benchmark and caused Canary and Firefox
+    // to have a new baseline. To make the graphs clearer we will drop data
+    // before then
+    data.series = data.series.map((line) => {
+      return line.filter((el) => {
         const date = new Date(el.date);
         let newEl = null;
         if (date >= new Date('2017-10-01')) {
@@ -41,6 +41,10 @@ export default class Speedometer extends Component {
         }
         return newEl;
       });
+    });
+
+    if (targetLine && targetDiff) {
+      canaryLastDataPoint = targetLine;
       // XXX: Index 1 represents Chrome
       // We need to replace Canary's data with an empty line
       data.series.splice(1, 1, []);
